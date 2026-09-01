@@ -16,7 +16,3 @@ desktop.ini
 
 # Logs da ferramenta de migracao de Java
 .github/java-upgrade/
-
-# Pasta legada com as atividades ainda nao migradas para a nova estrutura.
-# Cada uma entra no repositorio quando for organizada, como foi feito com a ATV1.
-TAREFAS-FERNANDO/
