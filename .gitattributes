@@ -1,0 +1,13 @@
+# Normaliza quebras de linha: LF no repositorio, nativo no working tree
+* text=auto eol=lf
+
+*.java   text eol=lf
+*.md     text eol=lf
+*.json   text eol=lf
+*.gitignore text eol=lf
+
+# Binarios: nunca converter
+*.class  binary
+*.jar    binary
+*.zip    binary
+*.png    binary
