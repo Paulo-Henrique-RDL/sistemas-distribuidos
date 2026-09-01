@@ -33,7 +33,3 @@ java -cp bin Cliente
 ```
 
 Cada mensagem digitada recebe `Servidor recebeu: <mensagem>` de volta. Digite `sair` para encerrar.
-
-### Limitações
-
-Servidor single-thread: atende um cliente por vez e encerra quando ele desconecta. Host e porta são fixos no código.
