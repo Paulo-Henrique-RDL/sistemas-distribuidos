@@ -30,6 +30,7 @@ public class Servidor {
             socket.close();
 
         } catch (IOException e) {
+            System.err.println("Erro no Servidor: " + e.getMessage());
             e.printStackTrace();
         }
     }
