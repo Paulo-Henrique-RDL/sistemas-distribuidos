@@ -1,6 +1,11 @@
 {
     "java.compile.nullAnalysis.mode": "automatic",
-    "java.project.sourcePaths": ["atv1-socket-tcp/src", "atv2-socket-udp/src"],
+    "java.project.sourcePaths": [
+        "atv1-socket-tcp/src",
+        "atv2-socket-udp/src",
+        "atv3-rmi/controle-remoto/src",
+        "atv3-rmi/jokenpo-spock/src"
+    ],
     "java.project.outputPath": "bin",
     "files.encoding": "utf8",
     "files.eol": "\n"
