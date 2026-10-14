@@ -16,3 +16,6 @@ desktop.ini
 
 # Logs da ferramenta de migracao de Java
 .github/java-upgrade/
+
+# Material de estudo local, nao faz parte da entrega
+atv4-config-server/explicacao.html

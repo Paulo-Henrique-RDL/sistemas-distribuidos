@@ -1,0 +1,38 @@
+===============================================================================
+ EVIDENCIA 03 - Teste negativo: cliente sem o Config Server no ar
+===============================================================================
+
+Com o servidor desligado, o cliente-vendas foi iniciado sozinho.
+O prefixo optional: em spring.config.import faz a aplicacao subir mesmo assim,
+mas sem nenhuma propriedade remota - entao ela cai nos valores padrao.
+
+-------------------------------------------------------------------------------
+Servidor fora do ar:
+
+$ curl http://localhost:8888/actuator/health
+(sem resposta - conexao recusada)
+
+-------------------------------------------------------------------------------
+Aviso do proprio cliente no log:
+
+2026-10-13T23:40:56.527-03:00  INFO 30332 --- [cliente-vendas] [           main] o.s.c.c.c.ConfigServerConfigDataLoader   : Fetching config from server at : http://localhost:8888
+2026-10-13T23:40:56.527-03:00  INFO 30332 --- [cliente-vendas] [           main] o.s.c.c.c.ConfigServerConfigDataLoader   : Exception on Url - http://localhost:8888:org.springframework.web.client.ResourceAccessException: I/O error on GET request for "http://localhost:8888/cliente-vendas/default": Connection refused: getsockopt. Will be trying the next url if available
+2026-10-13T23:40:56.528-03:00  WARN 30332 --- [cliente-vendas] [           main] o.s.c.c.c.ConfigServerConfigDataLoader   : Could not locate PropertySource ([ConfigServerConfigDataResource@28a0fd6c uris = array<String>['http://localhost:8888'], optional = true, profiles = 'default']): I/O error on GET request for "http://localhost:8888/cliente-vendas/default": Connection refused: getsockopt
+2026-10-13T23:40:56.528-03:00  INFO 30332 --- [cliente-vendas] [           main] o.s.c.c.c.ConfigServerConfigDataLoader   : Fetching config from server at : http://localhost:8888
+2026-10-13T23:40:56.528-03:00  INFO 30332 --- [cliente-vendas] [           main] o.s.c.c.c.ConfigServerConfigDataLoader   : Exception on Url - http://localhost:8888:org.springframework.web.client.ResourceAccessException: I/O error on GET request for "http://localhost:8888/cliente-vendas/dev": Connection refused: getsockopt. Will be trying the next url if available
+
+-------------------------------------------------------------------------------
+Porta em que subiu - 8080, o padrao do Spring Boot, e nao a 8081:
+
+2026-10-13T23:40:58.797-03:00  INFO 30332 --- [cliente-vendas] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2026-10-13T23:40:58.828-03:00  INFO 30332 --- [cliente-vendas] [           main] b.e.i.c.ClienteVendasApplication         : Started ClienteVendasApplication in 3.506 seconds (process running for 4.268)
+
+-------------------------------------------------------------------------------
+$ curl http://localhost:8081/mensagem      (a porta que vinha do repositorio)
+(sem resposta - conexao recusada)
+
+$ curl http://localhost:8080/mensagem      (a porta padrao)
+Configuracao nao carregada
+
+Conclusao: o texto e a porta usados nas evidencias 01 e 02 vinham mesmo do
+repositorio central, e nao de qualquer arquivo local do cliente.

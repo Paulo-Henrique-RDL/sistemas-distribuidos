@@ -1,0 +1,38 @@
+===============================================================================
+ EVIDENCIA 02 - Clientes subindo nas portas vindas do repositorio de configs
+===============================================================================
+
+Nenhum dos tres clientes declara server.port no seu application.properties.
+As portas 8081, 8082 e 8083 existem apenas no repositorio atv4-repo-configs.
+Terem subido nelas prova que a configuracao central foi carregada.
+
+-------------------------------------------------------------------------------
+$ grep -c server.port */src/main/resources/application.properties
+cliente-vendas/src/main/resources/application.properties:0
+cliente-estoque/src/main/resources/application.properties:0
+cliente-relatorios/src/main/resources/application.properties:0
+
+-------------------------------------------------------------------------------
+Linhas de inicializacao de cada cliente:
+
+2026-10-13T23:39:24.866-03:00  INFO 6236 --- [cliente-vendas] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8081 (http) with context path '/'
+2026-10-13T23:39:24.888-03:00  INFO 6236 --- [cliente-vendas] [           main] b.e.i.c.ClienteVendasApplication         : Started ClienteVendasApplication in 6.053 seconds (process running for 6.779)
+
+2026-10-13T23:39:26.014-03:00  INFO 26220 --- [cliente-estoque] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8082 (http) with context path '/'
+2026-10-13T23:39:26.035-03:00  INFO 26220 --- [cliente-estoque] [           main] b.e.i.c.ClienteEstoqueApplication        : Started ClienteEstoqueApplication in 7.211 seconds (process running for 7.955)
+
+2026-10-13T23:39:25.471-03:00  INFO 17296 --- [cliente-relatorios] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8083 (http) with context path '/'
+2026-10-13T23:39:25.491-03:00  INFO 17296 --- [cliente-relatorios] [           main] b.e.i.c.ClienteRelatoriosApplication     : Started ClienteRelatoriosApplication in 6.671 seconds (process running for 7.382)
+
+-------------------------------------------------------------------------------
+Endpoint /mensagem de cada cliente:
+
+$ curl http://localhost:8081/mensagem
+Bem-vindo ao sistema de Vendas - Ambiente DEV
+
+$ curl http://localhost:8082/mensagem
+Serviço de Estoque inicializado - Ambiente DEV
+
+$ curl http://localhost:8083/mensagem
+Serviço de Relatórios em execução - Ambiente DEV
+
