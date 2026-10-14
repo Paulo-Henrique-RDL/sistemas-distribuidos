@@ -1,0 +1,19 @@
+# Artefatos de build dos quatro projetos
+target/
+!.mvn/wrapper/maven-wrapper.jar
+
+# Editores e IDEs
+.idea/
+*.iml
+.vscode/
+.settings/
+.classpath
+.project
+
+# Sistema operacional
+Thumbs.db
+.DS_Store
+desktop.ini
+
+# Logs
+*.log
