@@ -7,8 +7,15 @@ Atividades da disciplina. Cada uma fica em sua própria pasta e é documentada e
 | 1 | Múltiplas mensagens sobre TCP | [`atv1-socket-tcp/`](atv1-socket-tcp/) |
 | 2 | Monitoramento de sensores em tempo real sobre UDP | [`atv2-socket-udp/`](atv2-socket-udp/) |
 | 3 | RMI: controle remoto e Pedra, Papel, Tesoura, Lagarto e Spock | [`atv3-rmi/`](atv3-rmi/) |
+| 4 | Configuração centralizada com Spring Cloud Config | [`atv4-config-server/`](atv4-config-server/) |
+| — | Projeto Integrador: contas a pagar e a receber | [`projeto-integrador/`](projeto-integrador/) |
 
-Requisito: **JDK 17 ou superior**.
+As três primeiras atividades são Java puro e pedem **JDK 17 ou superior**. A ATV4
+e o Projeto Integrador são Spring Boot e pedem **JDK 21 ou superior**; as duas
+trazem o Maven embutido e têm README próprio, com instruções de execução.
+
+Como este repositório se relaciona com os repositórios entregues ao professor
+está em [`AGENTS.md`](AGENTS.md).
 
 ---
 
@@ -145,3 +152,31 @@ java -cp bin ClienteJogo 192.168.0.10 1100 ana 192.168.0.20
 ```
 
 O controle remoto usa a porta 1099 e o jogo, a 1100. Libere o Java no firewall das duas máquinas.
+
+---
+
+## ATV4 — Configuração centralizada com Spring Cloud Config
+
+> **Enunciado:** implementar um Config Server que serve configurações a partir de um repositório Git remoto, e três aplicações clientes que consomem dele suas propriedades, demonstrando perfis de ambiente, versionamento e integração entre microsserviços.
+
+Quatro aplicações Spring Boot. As três clientes não sabem qual é a sua mensagem
+nem em que porta devem subir: as duas coisas chegam do servidor da porta 8888,
+que por sua vez as lê do repositório
+[atv4-repo-configs](https://github.com/Paulo-Henrique-RDL/atv4-repo-configs).
+
+Que as portas 8081, 8082 e 8083 existam apenas naquele repositório é o que torna
+a demonstração verificável: se um cliente sobe na porta certa, a configuração
+remota foi aplicada.
+
+Execução, testes e relatório em [`atv4-config-server/README.md`](atv4-config-server/README.md).
+
+---
+
+## Projeto Integrador — Contas a pagar e a receber
+
+Sistema de controle financeiro em Spring Boot, construído em duas etapas: a
+aplicação monolítica, entregue, e a decomposição em microsserviços, da segunda
+etapa da disciplina.
+
+Documentação, diagramas e instruções em
+[`projeto-integrador/README.md`](projeto-integrador/README.md).

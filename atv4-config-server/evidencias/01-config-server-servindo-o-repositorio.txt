@@ -1,0 +1,76 @@
+===============================================================================
+ EVIDENCIA 01 - Config Server no ar, servindo o repositorio Git
+===============================================================================
+
+$ grep -E 'Tomcat started|Started ConfigServer' config-server.log
+2026-10-13T23:38:11.383-03:00  INFO 19056 --- [config-server] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8888 (http) with context path '/'
+2026-10-13T23:38:11.415-03:00  INFO 19056 --- [config-server] [           main] b.e.i.c.ConfigServerApplication          : Started ConfigServerApplication in 9.434 seconds (process running for 10.276)
+
+-------------------------------------------------------------------------------
+$ curl http://localhost:8888/actuator/health
+{"status":"UP"}
+
+-------------------------------------------------------------------------------
+Consulta direta ao servidor. O campo 'version' e o SHA do commit do
+repositorio atv4-repo-configs de onde o valor foi lido.
+
+$ curl http://localhost:8888/cliente-vendas/dev
+{
+    "name": "cliente-vendas",
+    "profiles": [
+        "dev"
+    ],
+    "label": null,
+    "version": "bf6c520605f7d4b765ae291e6247a4cb49599274",
+    "state": "",
+    "propertySources": [
+        {
+            "name": "https://github.com/Paulo-Henrique-RDL/atv4-repo-configs.git/cliente-vendas-dev.properties",
+            "source": {
+                "mensagem.boasvindas": "Bem-vindo ao sistema de Vendas - Ambiente DEV",
+                "server.port": "8081"
+            }
+        }
+    ]
+}
+
+$ curl http://localhost:8888/cliente-estoque/dev
+{
+    "name": "cliente-estoque",
+    "profiles": [
+        "dev"
+    ],
+    "label": null,
+    "version": "bf6c520605f7d4b765ae291e6247a4cb49599274",
+    "state": "",
+    "propertySources": [
+        {
+            "name": "https://github.com/Paulo-Henrique-RDL/atv4-repo-configs.git/cliente-estoque-dev.properties",
+            "source": {
+                "mensagem.boasvindas": "Servi\u00c3\u00a7o de Estoque inicializado - Ambiente DEV",
+                "server.port": "8082"
+            }
+        }
+    ]
+}
+
+$ curl http://localhost:8888/cliente-relatorios/dev
+{
+    "name": "cliente-relatorios",
+    "profiles": [
+        "dev"
+    ],
+    "label": null,
+    "version": "bf6c520605f7d4b765ae291e6247a4cb49599274",
+    "state": "",
+    "propertySources": [
+        {
+            "name": "https://github.com/Paulo-Henrique-RDL/atv4-repo-configs.git/cliente-relatorios-dev.properties",
+            "source": {
+                "mensagem.boasvindas": "Servi\u00c3\u00a7o de Relat\u00c3\u00b3rios em execu\u00c3\u00a7\u00c3\u00a3o - Ambiente DEV",
+                "server.port": "8083"
+            }
+        }
+    ]
+}
+
