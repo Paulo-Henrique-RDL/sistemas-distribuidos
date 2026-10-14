@@ -31,6 +31,7 @@ Só se edita o monorepo. O repositório da entrega é sempre gerado a partir del
 | ATV3 — RMI | `atv3-rmi/` | `atv3-rmi-temporario` |
 | Projeto Integrador | `projeto-integrador/` | `contas-pagar-receber` |
 | ATV4 — Spring Cloud Config | `atv4-config-server/` | `atv4-config-server-temporario` |
+| ATV5 — Microsserviços | `atv5-microsservicos/` | `atv5-microsservicos-temporario` |
 
 `atv4-repo-configs` é um caso à parte: não é cópia de nada. É o repositório de configurações que o Config Server da ATV4 clona em tempo de execução, e por isso precisa existir sozinho.
 

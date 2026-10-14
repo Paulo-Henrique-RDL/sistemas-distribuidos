@@ -1,0 +1,116 @@
+===============================================================================
+ EVIDENCIA 03 - Comunicacao entre microsservicos
+===============================================================================
+
+-------------------------------------------------------------------------------
+LEITURA: o pedido vem do banco local, o cliente vem do cliente-service.
+
+$ curl http://localhost:8300/pedidos/1
+{
+    "id": 1,
+    "cliente": {
+        "id": 1,
+        "nome": "Mariana Lopes",
+        "documento": "123.456.789-00",
+        "email": "mariana.lopes@email.com"
+    },
+    "situacao": "CRIADO",
+    "valorTotal": 1229.7,
+    "dataPedido": "2026-10-10T09:30:00",
+    "itens": [
+        {
+            "id": 1,
+            "produtoId": 1,
+            "sku": "TEC-001",
+            "nomeProduto": "Teclado mecanico ABNT2",
+            "quantidade": 1,
+            "precoUnitario": 289.9,
+            "subtotal": 289.9
+        },
+        {
+            "id": 2,
+            "produtoId": 2,
+            "sku": "MOU-002",
+            "nomeProduto": "Mouse sem fio 1600 DPI",
+            "quantidade": 1,
+            "precoUnitario": 89.9,
+            "subtotal": 89.9
+        },
+        {
+            "id": 3,
+            "produtoId": 4,
+            "sku": "HEA-004",
+            "nomeProduto": "Headset com microfone",
+            "quantidade": 1,
+            "precoUnitario": 159.9,
+            "subtotal": 159.9
+        },
+        {
+            "id": 4,
+            "produtoId": 3,
+            "sku": "MON-003",
+            "nomeProduto": "Monitor 24 polegadas",
+            "quantidade": 1,
+            "precoUnitario": 690.0,
+            "subtotal": 690.0
+        }
+    ]
+}
+
+O bloco "cliente" nao existe no banco de pedidos: ele foi buscado em
+GET http://localhost:8100/clientes/1 no momento da resposta.
+
+Observe tambem o monitor a 690,00 neste pedido. O catalogo cobra 949,00 hoje:
+o item guarda o preco praticado na data da compra, e por isso o historico nao
+muda quando o catalogo reajusta.
+
+-------------------------------------------------------------------------------
+ESCRITA: ao abrir um pedido, o preco vem do catalogo, nao de quem chama.
+
+$ curl -X POST http://localhost:8300/pedidos \
+    -d '{"clienteId":4,"itens":[{"produtoId":3,"quantidade":1},{"produtoId":4,"quantidade":2}]}'
+
+{
+    "id": 5,
+    "cliente": {
+        "id": 4,
+        "nome": "Distribuidora Sul",
+        "documento": "23.456.789/0001-01",
+        "email": "pedidos@distsul.com.br"
+    },
+    "situacao": "CRIADO",
+    "valorTotal": 1268.8,
+    "dataPedido": "2026-10-14T00:30:46.18922",
+    "itens": [
+        {
+            "id": 9,
+            "produtoId": 3,
+            "sku": "MON-003",
+            "nomeProduto": "Monitor 24 polegadas",
+            "quantidade": 1,
+            "precoUnitario": 949.0,
+            "subtotal": 949.0
+        },
+        {
+            "id": 10,
+            "produtoId": 4,
+            "sku": "HEA-004",
+            "nomeProduto": "Headset com microfone",
+            "quantidade": 2,
+            "precoUnitario": 159.9,
+            "subtotal": 319.8
+        }
+    ]
+}
+
+A requisicao informou apenas produto e quantidade. O monitor entrou a 949,00
+e o headset a 159,90 porque foi isso que o catalogo-service respondeu, e o
+total foi calculado a partir dai.
+
+-------------------------------------------------------------------------------
+Os dois servicos consultados, para conferencia:
+
+$ curl http://localhost:8100/clientes/4
+{"id":4,"nome":"Distribuidora Sul","documento":"23.456.789/0001-01","email":"pedidos@distsul.com.br","cidade":"Curitiba","uf":"PR"}
+$ curl http://localhost:8200/produtos/3
+{"id":3,"sku":"MON-003","nome":"Monitor 24 polegadas","descricao":"IPS Full HD, 75 Hz, HDMI e VGA","preco":949.00,"estoque":15}
