@@ -1,0 +1,67 @@
+===============================================================================
+ EVIDENCIA 04 - Tratamento de erros (handle e Exceptions)
+===============================================================================
+
+Todos os servicos respondem no mesmo formato, com o campo "servico" dizendo
+de onde veio a falha. Nenhum controlador tem try/catch: quem trata e a classe
+TratadorDeErros, anotada com @RestControllerAdvice.
+
+-------------------------------------------------------------------------------
+400 - validacao: requisicao sem cliente e sem itens
+
+{"momento":"2026-10-14T00:31:12.711231","status":400,"erro":"Bad Request","mensagem":"Dados invalidos. Verifique os campos informados.","caminho":"/pedidos","servico":"pedido-service","campos":[{"campo":"clienteId","mensagem":"Informe o cliente"},{"campo":"itens","mensagem":"O pedido precisa de pelo menos um item"}]}
+-> HTTP 400
+
+-------------------------------------------------------------------------------
+404 - id inexistente no proprio servico
+
+{"momento":"2026-10-14T00:31:12.808195","status":404,"erro":"Not Found","mensagem":"Pedido nao encontrado para o id 999.","caminho":"/pedidos/999","servico":"pedido-service"}
+-> HTTP 404
+
+-------------------------------------------------------------------------------
+404 - id inexistente em OUTRO servico.
+O pedido-service perguntou ao cliente-service, recebeu 404 e traduziu para um
+404 proprio, com a mensagem certa. Sem esse tratamento seria um 500 generico.
+
+{"momento":"2026-10-14T00:31:12.9028993","status":404,"erro":"Not Found","mensagem":"Cliente nao encontrado para o id 999.","caminho":"/pedidos","servico":"pedido-service"}
+-> HTTP 404
+
+-------------------------------------------------------------------------------
+409 - regra de negocio: a cadeira CAD-005 tem estoque 2
+
+{"momento":"2026-10-14T00:31:13.0269598","status":409,"erro":"Conflict","mensagem":"Estoque insuficiente para o produto CAD-005 (Cadeira de escritorio): disponivel 2, pedido 10.","caminho":"/pedidos","servico":"pedido-service"}
+-> HTTP 409
+
+-------------------------------------------------------------------------------
+409 - operacao repetida: o pedido 2 ja esta cancelado
+
+{"momento":"2026-10-14T00:31:13.1170139","status":409,"erro":"Conflict","mensagem":"O pedido 2 ja esta cancelado.","caminho":"/pedidos/2/cancelar","servico":"pedido-service"}
+-> HTTP 409
+
+-------------------------------------------------------------------------------
+503 - um servico de que dependemos nao respondeu
+
+O catalogo-service foi encerrado (PID 28972). Esta e a situacao que so existe
+porque o sistema e distribuido: no monolito, chamar outro modulo era uma
+chamada de metodo que nao falhava por rede.
+
+$ curl http://localhost:8200/actuator/health
+  -> HTTP 000
+  -> conexao recusada, o servico esta fora
+
+$ curl -X POST http://localhost:8300/pedidos  (precisa do catalogo)
+{"momento":"2026-10-14T00:31:19.2372157","status":503,"erro":"Service Unavailable","mensagem":"O servico catalogo-service nao respondeu. Tente novamente em instantes.","caminho":"/pedidos","servico":"pedido-service"}
+-> HTTP 503
+
+503, e nao 500: a causa e temporaria e de terceiro, entao faz sentido tentar
+de novo. O nome do servico que falhou vai no corpo para facilitar o diagnostico.
+
+-------------------------------------------------------------------------------
+E a leitura de pedidos continua funcionando, porque nao depende do catalogo:
+
+$ curl http://localhost:8300/pedidos/1
+{"id":1,"cliente":{"id":1,"nome":"Mariana Lopes","documento":"123.456.789-00","email":"mariana.lopes@email.com"},"situacao":"CRIADO","valorTotal":1229.70,"dataPedido":"2026-10-10T09:30:00","itens":[{"id":1,"produtoId":1,"sku":"TEC-001","nomeProduto":"Teclado mecanico ABNT2","quantidade":1,"precoUnitario":289.90,"subtotal":289.90},{"id":2,"produtoId":2,"sku":"MOU-002","nomeProduto":"Mouse sem fio 1600 DPI","quantidade":1,"precoUnitario":89.90,"subtotal":89.90},{"id":3,"produtoId":4,"sku":"HEA-004","nomeProduto":"Headset com microfone","quantidade":1,"precoUnitario":159.90,"subtotal":159.90},{"id":4,"produtoId":3,"sku":"MON-003","nomeProduto":"Monitor 24 polegadas","quantidade":1,"precoUnitario":690.00,"subtotal":690.00}]}
+-> HTTP 200
+
+A falha de um servico derruba so o que depende dele. Isso e isolamento de
+falha, e e uma das razoes de separar em microsservicos.

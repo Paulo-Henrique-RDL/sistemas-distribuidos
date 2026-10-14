@@ -1,0 +1,67 @@
+===============================================================================
+ EVIDENCIA 01 - Tres microsservicos no ar, cada um com seu proprio banco
+===============================================================================
+
+-------------------------------------------------------------------------------
+Cada servico subiu em sua porta:
+
+2026-10-14T00:27:37.548-03:00  INFO 11684 --- [cliente-service] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8100 (http) with context path '/'
+2026-10-14T00:27:37.568-03:00  INFO 11684 --- [cliente-service] [           main] b.e.i.cliente.ClienteServiceApplication  : Started ClienteServiceApplication in 6.82 seconds (process running for 7.31)
+
+2026-10-14T00:28:51.750-03:00  INFO 28972 --- [catalogo-service] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8200 (http) with context path '/'
+2026-10-14T00:28:51.768-03:00  INFO 28972 --- [catalogo-service] [           main] b.e.i.c.CatalogoServiceApplication       : Started CatalogoServiceApplication in 10.46 seconds (process running for 10.968)
+
+2026-10-14T00:26:33.322-03:00  INFO 20964 --- [pedido-service] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8300 (http) with context path '/'
+2026-10-14T00:26:33.342-03:00  INFO 20964 --- [pedido-service] [           main] b.e.i.pedido.PedidoServiceApplication    : Started PedidoServiceApplication in 7.163 seconds (process running for 7.66)
+
+-------------------------------------------------------------------------------
+Saude dos tres:
+
+$ curl http://localhost:8100/actuator/health
+  {"status":"UP"}
+$ curl http://localhost:8200/actuator/health
+  {"status":"UP"}
+$ curl http://localhost:8300/actuator/health
+  {"status":"UP"}
+
+-------------------------------------------------------------------------------
+Cada servico tem seu proprio arquivo de banco:
+
+cliente-service    clientes.lock.db clientes.mv.db 
+catalogo-service   catalogo.lock.db catalogo.mv.db 
+pedido-service     pedidos.lock.db pedidos.mv.db 
+
+-------------------------------------------------------------------------------
+Tabelas de cada banco, consultadas de fora da aplicacao.
+Repare que o banco de pedidos NAO tem tabela CLIENTE nem PRODUTO: esses dados
+estao nos outros bancos e so chegam por HTTP.
+
+--- cliente-service  (dados/clientes)
+TABLE_NAME
+CLIENTE
+flyway_schema_history
+(2 rows, 7 ms)
+
+--- catalogo-service  (dados/catalogo)
+TABLE_NAME
+PRODUTO
+flyway_schema_history
+(2 rows, 7 ms)
+
+--- pedido-service  (dados/pedidos)
+TABLE_NAME
+ITEM_PEDIDO
+PEDIDO
+flyway_schema_history
+(3 rows, 7 ms)
+
+-------------------------------------------------------------------------------
+O Flyway criou e populou os tres bancos na primeira execucao:
+
+  cliente:    Successfully applied 2 migrations to schema "PUBLIC", now at version v2 (execution time 00:00.009s)
+  catalogo:   Schema "PUBLIC" is up to date. No migration necessary.
+  pedido:     Successfully applied 2 migrations to schema "PUBLIC", now at version v2 (execution time 00:00.018s)
+
+O catalogo-service foi reiniciado durante o teste de falha (evidencia 04), entao
+o log atual dele mostra que as migrations ja estavam aplicadas: o Flyway registra
+o que rodou em flyway_schema_history e nao repete.

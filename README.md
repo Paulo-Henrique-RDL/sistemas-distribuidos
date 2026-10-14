@@ -8,6 +8,7 @@ Atividades da disciplina. Cada uma fica em sua própria pasta e é documentada e
 | 2 | Monitoramento de sensores em tempo real sobre UDP | [`atv2-socket-udp/`](atv2-socket-udp/) |
 | 3 | RMI: controle remoto e Pedra, Papel, Tesoura, Lagarto e Spock | [`atv3-rmi/`](atv3-rmi/) |
 | 4 | Configuração centralizada com Spring Cloud Config | [`atv4-config-server/`](atv4-config-server/) |
+| 5 | Microsserviços com base de dados própria | [`atv5-microsservicos/`](atv5-microsservicos/) |
 | — | Projeto Integrador: contas a pagar e a receber | [`projeto-integrador/`](projeto-integrador/) |
 
 As três primeiras atividades são Java puro e pedem **JDK 17 ou superior**. A ATV4
@@ -180,3 +181,24 @@ etapa da disciplina.
 
 Documentação, diagramas e instruções em
 [`projeto-integrador/README.md`](projeto-integrador/README.md).
+
+---
+
+## ATV5 — Microsserviços com base de dados própria
+
+> **Enunciado:** tema livre, no mínimo 3 microsserviços, cada um com sua própria base de dados; pelo menos um com duas tabelas se relacionando. O repositório deve ter o código completo, os arquivos para popular o banco e todos os pacotes necessários, inclusive tratamento de erros e exceções.
+
+Uma loja em três serviços: `cliente-service` (8100), `catalogo-service` (8200) e
+`pedido-service` (8300). Cada um tem **seu próprio banco**, e o de pedidos traz
+as duas tabelas relacionadas — `pedido` 1—N `item_pedido`.
+
+Nenhum serviço lê o banco do outro. Quando o pedido precisa saber se o cliente
+existe ou quanto custa um produto, ele **pergunta por HTTP** — e é por isso que
+aparece um código de erro que o monolito não tinha: **503**, quando a dependência
+não responde.
+
+Os bancos são criados e populados pelo **Flyway** na primeira execução, e o
+Hibernate roda em `ddl-auto=validate`: ele não cria tabela, só confere se as
+entidades batem com as migrations.
+
+Execução, testes e relatório em [`atv5-microsservicos/README.md`](atv5-microsservicos/README.md).
