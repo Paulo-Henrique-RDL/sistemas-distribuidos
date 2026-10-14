@@ -1,0 +1,34 @@
+########## CENARIO 15: criar conta a receber
+{"id":1,"descricao":"Venda de suprimentos","numeroDocumento":"NF-2001","cliente":{"id":2,"nome":"Mercado Bom Preco"},"categoria":{"id":1,"nome":"Material de escritorio"},"valor":1250.00,"dataEmissao":"2026-10-02","dataVencimento":"2026-11-02","situacao":"ABERTA","dataCadastro":"2026-10-06T22:25:29.944869","dataAtualizacao":"2026-10-06T22:25:29.944869"}
+[HTTP 201]
+
+########## CENARIO 16: registrar recebimento (espera 200, situacao RECEBIDA)
+{"id":1,"descricao":"Venda de suprimentos","numeroDocumento":"NF-2001","cliente":{"id":2,"nome":"Mercado Bom Preco"},"categoria":{"id":1,"nome":"Material de escritorio"},"valor":1250.00,"dataEmissao":"2026-10-02","dataVencimento":"2026-11-02","dataRecebimento":"2026-10-06","valorRecebido":1250.00,"formaRecebimento":{"id":1,"nome":"PIX"},"situacao":"RECEBIDA","dataCadastro":"2026-10-06T22:25:29.944869","dataAtualizacao":"2026-10-06T22:25:29.944869"}
+[HTTP 200]
+
+########## CENARIO 17: receber de novo (espera 409)
+{"momento":"2026-10-06T22:25:30.1574516","status":409,"erro":"Conflict","mensagem":"A conta ja foi recebida em 2026-10-06.","caminho":"/api/contas-receber/1/receber"}
+[HTTP 409]
+
+########## CENARIO 18: criar e cancelar uma conta a receber
+{"id":2,"descricao":"Venda cancelada pelo cliente","cliente":{"id":2,"nome":"Mercado Bom Preco"},"categoria":{"id":1,"nome":"Material de escritorio"},"valor":300.00,"dataEmissao":"2026-10-03","dataVencimento":"2026-11-03","situacao":"ABERTA","dataCadastro":"2026-10-06T22:25:30.248812","dataAtualizacao":"2026-10-06T22:25:30.248812"}
+[HTTP 201]
+--- POST /contas-receber/2/cancelar
+{"id":2,"descricao":"Venda cancelada pelo cliente","cliente":{"id":2,"nome":"Mercado Bom Preco"},"categoria":{"id":1,"nome":"Material de escritorio"},"valor":300.00,"dataEmissao":"2026-10-03","dataVencimento":"2026-11-03","situacao":"CANCELADA","dataCadastro":"2026-10-06T22:25:30.248812","dataAtualizacao":"2026-10-06T22:25:30.248812"}
+[HTTP 200]
+
+########## CENARIO 19: cancelar duas vezes (espera 409)
+{"momento":"2026-10-06T22:25:30.4575331","status":409,"erro":"Conflict","mensagem":"A conta ja esta cancelada.","caminho":"/api/contas-receber/2/cancelar"}
+[HTTP 409]
+
+########## CENARIO 20: situacao PAGA em conta a receber (espera 409)
+{"momento":"2026-10-06T22:25:30.5546834","status":409,"erro":"Conflict","mensagem":"A situacao PAGA nao se aplica a contas a receber. Use RECEBIDA.","caminho":"/api/contas-receber"}
+[HTTP 409]
+
+########## CENARIO 21: excluir pessoa com contas vinculadas (espera 409)
+{"momento":"2026-10-06T22:25:30.6558332","status":409,"erro":"Conflict","mensagem":"A pessoa possui contas vinculadas e nao pode ser excluida.","caminho":"/api/pessoas/1"}
+[HTTP 409]
+
+########## CENARIO 22: parametro de data invalido (espera 400)
+{"momento":"2026-10-06T22:25:30.752448","status":400,"erro":"Bad Request","mensagem":"O parametro 'de' recebeu um valor invalido.","caminho":"/api/contas-pagar"}
+[HTTP 400]

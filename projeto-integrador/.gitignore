@@ -1,0 +1,26 @@
+# Artefatos de build
+target/
+!.mvn/wrapper/maven-wrapper.jar
+
+# Banco de dados local: cada desenvolvedor tem o seu, gerado na primeira execucao
+dados/
+*.mv.db
+*.trace.db
+*.lock.db
+
+# Editores e IDEs
+.idea/
+*.iml
+.vscode/
+.settings/
+.classpath
+.project
+nbproject/private/
+
+# Sistema operacional
+Thumbs.db
+.DS_Store
+desktop.ini
+
+# Logs
+*.log

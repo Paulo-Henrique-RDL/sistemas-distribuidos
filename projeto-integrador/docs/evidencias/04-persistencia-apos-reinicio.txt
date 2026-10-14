@@ -1,0 +1,7 @@
+﻿########## CENARIO 23: PERSISTENCIA APOS REINICIO
+antes de parar: 2 contas a pagar
+aplicacao encerrada
+aplicacao reiniciada: True
+depois do reinicio: 2 contas a pagar
+pessoas: 2 | contas a receber: 2
+RESULTADO: dados preservados - H2 em arquivo confirmado

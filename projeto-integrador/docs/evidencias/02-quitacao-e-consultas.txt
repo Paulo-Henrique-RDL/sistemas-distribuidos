@@ -1,0 +1,35 @@
+########## CENARIO 6: conta vencida (vencimento no passado) -> situacao derivada
+{"id":2,"descricao":"Energia eletrica setembro","fornecedor":{"id":1,"nome":"Papelaria Central Ltda"},"categoria":{"id":1,"nome":"Material de escritorio"},"valor":830.50,"dataEmissao":"2026-09-01","dataVencimento":"2026-09-20","situacao":"VENCIDA","dataCadastro":"2026-10-06T22:25:14.872016","dataAtualizacao":"2026-10-06T22:25:14.872016"}
+[HTTP 201]
+
+########## CENARIO 7: registrar pagamento (espera 200, situacao PAGA)
+{"id":1,"descricao":"Compra de papel A4","numeroDocumento":"NF-1001","fornecedor":{"id":1,"nome":"Papelaria Central Ltda"},"categoria":{"id":1,"nome":"Material de escritorio"},"valor":450.00,"dataEmissao":"2026-10-01","dataVencimento":"2026-11-10","dataPagamento":"2026-10-06","valorPago":450.00,"formaPagamento":{"id":1,"nome":"PIX"},"situacao":"PAGA","observacao":"Pedido mensal","dataCadastro":"2026-10-06T22:25:00.169068","dataAtualizacao":"2026-10-06T22:25:00.169068"}
+[HTTP 200]
+
+########## CENARIO 8: OPERACAO DUPLICADA - pagar de novo (espera 409)
+{"momento":"2026-10-06T22:25:15.1122277","status":409,"erro":"Conflict","mensagem":"A conta ja foi paga em 2026-10-06.","caminho":"/api/contas-pagar/1/pagar"}
+[HTTP 409]
+
+########## CENARIO 9: alterar conta ja paga (espera 409)
+{"momento":"2026-10-06T22:25:15.2169468","status":409,"erro":"Conflict","mensagem":"A conta ja foi paga e nao pode ser alterada.","caminho":"/api/contas-pagar/1"}
+[HTTP 409]
+
+########## CENARIO 10: excluir conta ja paga (espera 409)
+{"momento":"2026-10-06T22:25:15.3180785","status":409,"erro":"Conflict","mensagem":"A conta ja foi paga e nao pode ser excluida.","caminho":"/api/contas-pagar/1"}
+[HTTP 409]
+
+########## CENARIO 11: pagamento anterior a emissao (espera 409)
+{"momento":"2026-10-06T22:25:15.4063913","status":409,"erro":"Conflict","mensagem":"A data do pagamento nao pode ser anterior a emissao da conta.","caminho":"/api/contas-pagar/2/pagar"}
+[HTTP 409]
+
+########## CENARIO 12: CONSULTA POR SITUACAO = VENCIDA
+{"content":[{"id":2,"descricao":"Energia eletrica setembro","fornecedor":{"id":1,"nome":"Papelaria Central Ltda"},"categoria":{"id":1,"nome":"Material de escritorio"},"valor":830.50,"dataEmissao":"2026-09-01","dataVencimento":"2026-09-20","situacao":"VENCIDA","dataCadastro":"2026-10-06T22:25:14.872016","dataAtualizacao":"2026-10-06T22:25:14.872016"}],"pageable":{"pageNumber":0,"pageSize":20,"sort":{"empty":false,"sorted":true,"unsorted":false},"offset":0,"paged":true,"unpaged":false},"last":true,"totalPages":1,"totalElements":1,"first":true,"size":20,"number":0,"numberOfElements":1,"sort":{"empty":false,"sorted":true,"unsorted":false},"empty":false}
+[HTTP 200]
+
+########## CENARIO 13: CONSULTA POR SITUACAO = PAGA
+{"content":[{"id":1,"descricao":"Compra de papel A4","numeroDocumento":"NF-1001","fornecedor":{"id":1,"nome":"Papelaria Central Ltda"},"categoria":{"id":1,"nome":"Material de escritorio"},"valor":450.00,"dataEmissao":"2026-10-01","dataVencimento":"2026-11-10","dataPagamento":"2026-10-06","valorPago":450.00,"formaPagamento":{"id":1,"nome":"PIX"},"situacao":"PAGA","observacao":"Pedido mensal","dataCadastro":"2026-10-06T22:25:00.169068","dataAtualizacao":"2026-10-06T22:25:15.008579"}],"pageable":{"pageNumber":0,"pageSize":20,"sort":{"empty":false,"sorted":true,"unsorted":false},"offset":0,"paged":true,"unpaged":false},"last":true,"totalPages":1,"totalElements":1,"first":true,"size":20,"number":0,"numberOfElements":1,"sort":{"empty":false,"sorted":true,"unsorted":false},"empty":false}
+[HTTP 200]
+
+########## CENARIO 14: CONSULTA POR PERIODO (vencimento em setembro/2026)
+{"content":[{"id":2,"descricao":"Energia eletrica setembro","fornecedor":{"id":1,"nome":"Papelaria Central Ltda"},"categoria":{"id":1,"nome":"Material de escritorio"},"valor":830.50,"dataEmissao":"2026-09-01","dataVencimento":"2026-09-20","situacao":"VENCIDA","dataCadastro":"2026-10-06T22:25:14.872016","dataAtualizacao":"2026-10-06T22:25:14.872016"}],"pageable":{"pageNumber":0,"pageSize":20,"sort":{"empty":false,"sorted":true,"unsorted":false},"offset":0,"paged":true,"unpaged":false},"last":true,"totalPages":1,"totalElements":1,"first":true,"size":20,"number":0,"numberOfElements":1,"sort":{"empty":false,"sorted":true,"unsorted":false},"empty":false}
+[HTTP 200]

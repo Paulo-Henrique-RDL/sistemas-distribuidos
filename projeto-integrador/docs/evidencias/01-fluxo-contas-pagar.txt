@@ -1,0 +1,29 @@
+########## CENARIO 1: cadastros base
+--- POST /pessoas (fornecedor)
+{"id":1,"nome":"Papelaria Central Ltda","documento":"12.345.678/0001-90","tipo":"FORNECEDOR","email":"contato@papelaria.com.br","telefone":"64 3333-1000"}
+[HTTP 201]
+--- POST /pessoas (cliente)
+{"id":2,"nome":"Mercado Bom Preco","documento":"98.765.432/0001-10","tipo":"CLIENTE","email":"financeiro@bompreco.com.br"}
+[HTTP 201]
+--- POST /categorias
+{"id":1,"nome":"Material de escritorio","descricao":"Papelaria e suprimentos"}
+[HTTP 201]
+--- POST /formas-pagamento
+{"id":1,"nome":"PIX"}
+[HTTP 201]
+
+########## CENARIO 2: criar conta a pagar (espera 201, situacao ABERTA)
+{"id":1,"descricao":"Compra de papel A4","numeroDocumento":"NF-1001","fornecedor":{"id":1,"nome":"Papelaria Central Ltda"},"categoria":{"id":1,"nome":"Material de escritorio"},"valor":450.00,"dataEmissao":"2026-10-01","dataVencimento":"2026-11-10","situacao":"ABERTA","observacao":"Pedido mensal","dataCadastro":"2026-10-06T22:25:00.169068","dataAtualizacao":"2026-10-06T22:25:00.169068"}
+[HTTP 201]
+
+########## CENARIO 3: vencimento anterior a emissao (espera 400)
+{"momento":"2026-10-06T22:25:00.3040845","status":400,"erro":"Bad Request","mensagem":"Dados invalidos. Verifique os campos informados.","caminho":"/api/contas-pagar","campos":[{"campo":"vencimentoPosteriorAEmissao","mensagem":"A data de vencimento nao pode ser anterior a data de emissao"}]}
+[HTTP 400]
+
+########## CENARIO 4: valor zero e campos faltando (espera 400 com lista)
+{"momento":"2026-10-06T22:25:00.4021161","status":400,"erro":"Bad Request","mensagem":"Dados invalidos. Verifique os campos informados.","caminho":"/api/contas-pagar","campos":[{"campo":"valor","mensagem":"O valor deve ser maior que zero"},{"campo":"descricao","mensagem":"A descricao e obrigatoria"},{"campo":"fornecedorId","mensagem":"Informe o fornecedor"},{"campo":"categoriaId","mensagem":"Informe a categoria"}]}
+[HTTP 400]
+
+########## CENARIO 5: fornecedor inexistente (espera 404)
+{"momento":"2026-10-06T22:25:00.473761","status":404,"erro":"Not Found","mensagem":"Pessoa de id 999 nao encontrada(o).","caminho":"/api/contas-pagar"}
+[HTTP 404]
