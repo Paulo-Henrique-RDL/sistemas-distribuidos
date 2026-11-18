@@ -57,6 +57,14 @@ class ContaPagarControladorTest {
     private Long categoriaId;
     private Long formaId;
 
+    // Datas relativas a hoje, e nao fixas. Com datas fixas o teste "vence": quando
+    // o vencimento fica no passado, a conta aberta passa a ser exibida como
+    // VENCIDA e a verificacao da situacao ABERTA falha.
+    private static final LocalDate HOJE = LocalDate.now();
+    private static final String EMISSAO = HOJE.minusDays(10).toString();
+    private static final String VENCIMENTO = HOJE.plusDays(30).toString();
+    private static final String PAGAMENTO = HOJE.toString();
+
     @BeforeEach
     void prepararDados() {
         // Limpa antes de cada teste: nenhum teste pode depender do que outro deixou.
@@ -78,8 +86,8 @@ class ContaPagarControladorTest {
     private String contaValida() {
         return """
                 {"descricao":"Compra de material","fornecedorId":%d,"categoriaId":%d,
-                 "valor":500.00,"dataEmissao":"2026-10-01","dataVencimento":"2026-11-01"}
-                """.formatted(fornecedorId, categoriaId);
+                 "valor":500.00,"dataEmissao":"%s","dataVencimento":"%s"}
+                """.formatted(fornecedorId, categoriaId, EMISSAO, VENCIMENTO);
     }
 
     private Long criarConta() throws Exception {
@@ -106,8 +114,8 @@ class ContaPagarControladorTest {
     void entradaInvalidaRetorna400() throws Exception {
         String invalida = """
                 {"descricao":"","fornecedorId":%d,"categoriaId":%d,
-                 "valor":0,"dataEmissao":"2026-10-01","dataVencimento":"2026-11-01"}
-                """.formatted(fornecedorId, categoriaId);
+                 "valor":0,"dataEmissao":"%s","dataVencimento":"%s"}
+                """.formatted(fornecedorId, categoriaId, EMISSAO, VENCIMENTO);
 
         mockMvc.perform(post("/api/contas-pagar")
                         .contentType(MediaType.APPLICATION_JSON).content(invalida))
@@ -134,8 +142,8 @@ class ContaPagarControladorTest {
     void fornecedorInexistenteRetorna404() throws Exception {
         String corpo = """
                 {"descricao":"Teste","fornecedorId":99999,"categoriaId":%d,
-                 "valor":100.00,"dataEmissao":"2026-10-01","dataVencimento":"2026-11-01"}
-                """.formatted(categoriaId);
+                 "valor":100.00,"dataEmissao":"%s","dataVencimento":"%s"}
+                """.formatted(categoriaId, EMISSAO, VENCIMENTO);
 
         mockMvc.perform(post("/api/contas-pagar")
                         .contentType(MediaType.APPLICATION_JSON).content(corpo))
@@ -155,8 +163,8 @@ class ContaPagarControladorTest {
     void registrarPagamento() throws Exception {
         Long id = criarConta();
         String pagamento = """
-                {"dataPagamento":"2026-10-15","valorPago":500.00,"formaPagamentoId":%d}
-                """.formatted(formaId);
+                {"dataPagamento":"%s","valorPago":500.00,"formaPagamentoId":%d}
+                """.formatted(PAGAMENTO, formaId);
 
         mockMvc.perform(post("/api/contas-pagar/" + id + "/pagar")
                         .contentType(MediaType.APPLICATION_JSON).content(pagamento))
@@ -171,8 +179,8 @@ class ContaPagarControladorTest {
     void pagarDuasVezesRetorna409() throws Exception {
         Long id = criarConta();
         String pagamento = """
-                {"dataPagamento":"2026-10-15","valorPago":500.00,"formaPagamentoId":%d}
-                """.formatted(formaId);
+                {"dataPagamento":"%s","valorPago":500.00,"formaPagamentoId":%d}
+                """.formatted(PAGAMENTO, formaId);
 
         mockMvc.perform(post("/api/contas-pagar/" + id + "/pagar")
                 .contentType(MediaType.APPLICATION_JSON).content(pagamento));
@@ -190,8 +198,8 @@ class ContaPagarControladorTest {
         mockMvc.perform(post("/api/contas-pagar/" + id + "/pagar")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
-                        {"dataPagamento":"2026-10-15","valorPago":500.00,"formaPagamentoId":%d}
-                        """.formatted(formaId)));
+                        {"dataPagamento":"%s","valorPago":500.00,"formaPagamentoId":%d}
+                        """.formatted(PAGAMENTO, formaId)));
 
         mockMvc.perform(put("/api/contas-pagar/" + id)
                         .contentType(MediaType.APPLICATION_JSON).content(contaValida()))
@@ -205,8 +213,8 @@ class ContaPagarControladorTest {
         mockMvc.perform(post("/api/contas-pagar/" + id + "/pagar")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
-                        {"dataPagamento":"2026-10-15","valorPago":500.00,"formaPagamentoId":%d}
-                        """.formatted(formaId)));
+                        {"dataPagamento":"%s","valorPago":500.00,"formaPagamentoId":%d}
+                        """.formatted(PAGAMENTO, formaId)));
 
         mockMvc.perform(delete("/api/contas-pagar/" + id))
                 .andExpect(status().isConflict());
@@ -245,8 +253,8 @@ class ContaPagarControladorTest {
         mockMvc.perform(post("/api/contas-pagar/" + paga + "/pagar")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
-                        {"dataPagamento":"2026-10-15","valorPago":500.00,"formaPagamentoId":%d}
-                        """.formatted(formaId)));
+                        {"dataPagamento":"%s","valorPago":500.00,"formaPagamentoId":%d}
+                        """.formatted(PAGAMENTO, formaId)));
 
         mockMvc.perform(get("/api/contas-pagar").param("situacao", "PAGA"))
                 .andExpect(status().isOk())
@@ -260,7 +268,7 @@ class ContaPagarControladorTest {
         criarConta();
 
         mockMvc.perform(get("/api/contas-pagar")
-                        .param("de", "2026-10-25").param("ate", "2026-11-05"))
+                        .param("de", HOJE.plusDays(25).toString()).param("ate", HOJE.plusDays(35).toString()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.totalElements").value(1));
 

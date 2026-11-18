@@ -14,6 +14,7 @@ import br.edu.ifgoiano.contas.repositorio.CategoriaRepositorio;
 import br.edu.ifgoiano.contas.repositorio.ContaReceberRepositorio;
 import br.edu.ifgoiano.contas.repositorio.FormaPagamentoRepositorio;
 import br.edu.ifgoiano.contas.repositorio.PessoaRepositorio;
+import java.time.LocalDate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -46,6 +47,15 @@ class ContaReceberControladorTest {
     private Long categoriaId;
     private Long formaId;
 
+    // Datas relativas a hoje, e nao fixas. Com datas fixas o teste "vence": quando
+    // o vencimento fica no passado, a conta aberta passa a ser exibida como
+    // VENCIDA e a verificacao da situacao ABERTA falha.
+    private static final LocalDate HOJE = LocalDate.now();
+    private static final String EMISSAO = HOJE.minusDays(10).toString();
+    private static final String VENCIMENTO = HOJE.plusDays(30).toString();
+    private static final String RECEBIMENTO = HOJE.toString();
+    private static final String ANTES_DA_EMISSAO = HOJE.minusDays(40).toString();
+
     @BeforeEach
     void prepararDados() {
         contaReceberRepositorio.deleteAll();
@@ -63,8 +73,8 @@ class ContaReceberControladorTest {
     private Long criarConta() throws Exception {
         String corpo = """
                 {"descricao":"Venda de produtos","clienteId":%d,"categoriaId":%d,
-                 "valor":1200.00,"dataEmissao":"2026-10-01","dataVencimento":"2026-11-01"}
-                """.formatted(clienteId, categoriaId);
+                 "valor":1200.00,"dataEmissao":"%s","dataVencimento":"%s"}
+                """.formatted(clienteId, categoriaId, EMISSAO, VENCIMENTO);
 
         String resposta = mockMvc.perform(post("/api/contas-receber")
                         .contentType(MediaType.APPLICATION_JSON).content(corpo))
@@ -78,8 +88,8 @@ class ContaReceberControladorTest {
     void criarContaReceber() throws Exception {
         String corpo = """
                 {"descricao":"Venda de produtos","clienteId":%d,"categoriaId":%d,
-                 "valor":1200.00,"dataEmissao":"2026-10-01","dataVencimento":"2026-11-01"}
-                """.formatted(clienteId, categoriaId);
+                 "valor":1200.00,"dataEmissao":"%s","dataVencimento":"%s"}
+                """.formatted(clienteId, categoriaId, EMISSAO, VENCIMENTO);
 
         mockMvc.perform(post("/api/contas-receber")
                         .contentType(MediaType.APPLICATION_JSON).content(corpo))
@@ -93,8 +103,8 @@ class ContaReceberControladorTest {
     void registrarRecebimento() throws Exception {
         Long id = criarConta();
         String recebimento = """
-                {"dataRecebimento":"2026-10-20","valorRecebido":1200.00,"formaRecebimentoId":%d}
-                """.formatted(formaId);
+                {"dataRecebimento":"%s","valorRecebido":1200.00,"formaRecebimentoId":%d}
+                """.formatted(RECEBIMENTO, formaId);
 
         mockMvc.perform(post("/api/contas-receber/" + id + "/receber")
                         .contentType(MediaType.APPLICATION_JSON).content(recebimento))
@@ -108,8 +118,8 @@ class ContaReceberControladorTest {
     void receberDuasVezesRetorna409() throws Exception {
         Long id = criarConta();
         String recebimento = """
-                {"dataRecebimento":"2026-10-20","valorRecebido":1200.00,"formaRecebimentoId":%d}
-                """.formatted(formaId);
+                {"dataRecebimento":"%s","valorRecebido":1200.00,"formaRecebimentoId":%d}
+                """.formatted(RECEBIMENTO, formaId);
 
         mockMvc.perform(post("/api/contas-receber/" + id + "/receber")
                 .contentType(MediaType.APPLICATION_JSON).content(recebimento));
@@ -124,8 +134,8 @@ class ContaReceberControladorTest {
     void recebimentoAnteriorAEmissaoRetorna409() throws Exception {
         Long id = criarConta();
         String recebimento = """
-                {"dataRecebimento":"2026-09-01","valorRecebido":1200.00,"formaRecebimentoId":%d}
-                """.formatted(formaId);
+                {"dataRecebimento":"%s","valorRecebido":1200.00,"formaRecebimentoId":%d}
+                """.formatted(ANTES_DA_EMISSAO, formaId);
 
         mockMvc.perform(post("/api/contas-receber/" + id + "/receber")
                         .contentType(MediaType.APPLICATION_JSON).content(recebimento))
@@ -148,8 +158,8 @@ class ContaReceberControladorTest {
         mockMvc.perform(post("/api/contas-receber/" + recebida + "/receber")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
-                        {"dataRecebimento":"2026-10-20","valorRecebido":1200.00,"formaRecebimentoId":%d}
-                        """.formatted(formaId)));
+                        {"dataRecebimento":"%s","valorRecebido":1200.00,"formaRecebimentoId":%d}
+                        """.formatted(RECEBIMENTO, formaId)));
 
         mockMvc.perform(get("/api/contas-receber").param("situacao", "RECEBIDA"))
                 .andExpect(status().isOk())
