@@ -11,12 +11,9 @@ Atividades da disciplina. Cada uma fica em sua própria pasta e é documentada e
 | 5 | Microsserviços com base de dados própria | [`atv5-microsservicos/`](atv5-microsservicos/) |
 | — | Projeto Integrador: contas a pagar e a receber | [`projeto-integrador/`](projeto-integrador/) |
 
-As três primeiras atividades são Java puro e pedem **JDK 17 ou superior**. A ATV4
-e o Projeto Integrador são Spring Boot e pedem **JDK 21 ou superior**; as duas
-trazem o Maven embutido e têm README próprio, com instruções de execução.
-
-Como este repositório se relaciona com os repositórios entregues ao professor
-está em [`AGENTS.md`](AGENTS.md).
+As três primeiras atividades são Java puro e pedem **JDK 17 ou superior**. A ATV4,
+a ATV5 e o Projeto Integrador são Spring Boot e pedem **JDK 21 ou superior**; as
+três trazem o Maven embutido e têm README próprio, com instruções de execução.
 
 ---
 
