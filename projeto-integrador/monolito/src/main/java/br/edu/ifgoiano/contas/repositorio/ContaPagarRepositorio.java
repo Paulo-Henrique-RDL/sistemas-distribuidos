@@ -2,9 +2,7 @@ package br.edu.ifgoiano.contas.repositorio;
 
 import br.edu.ifgoiano.contas.modelo.ContaPagar;
 import br.edu.ifgoiano.contas.modelo.Situacao;
-import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -40,26 +38,6 @@ public interface ContaPagarRepositorio extends JpaRepository<ContaPagar, Long> {
                                       @Param("fornecedorId") Long fornecedorId,
                                       @Param("categoriaId") Long categoriaId,
                                       Pageable paginacao);
-
-    @EntityGraph(attributePaths = {"fornecedor", "categoria", "formaPagamento"})
-    List<ContaPagar> findBySituacaoAndDataVencimentoBeforeOrderByDataVencimento(Situacao situacao, LocalDate data);
-
-    /** Soma usada no resumo financeiro. O coalesce evita retorno nulo quando nao ha contas. */
-    @Query("""
-            select coalesce(sum(c.valor), 0) from ContaPagar c
-            where c.situacao = :situacao
-              and c.dataVencimento between :de and :ate
-            """)
-    BigDecimal somarPorSituacaoEPeriodo(@Param("situacao") Situacao situacao,
-                                        @Param("de") LocalDate de,
-                                        @Param("ate") LocalDate ate);
-
-    @Query("""
-            select coalesce(sum(c.valor), 0) from ContaPagar c
-            where c.situacao = br.edu.ifgoiano.contas.modelo.Situacao.ABERTA
-              and c.dataVencimento < :hoje
-            """)
-    BigDecimal somarVencidas(@Param("hoje") LocalDate hoje);
 
     /** Impede excluir pessoa, categoria ou forma que ja tenha conta vinculada. */
     boolean existsByFornecedorId(Long fornecedorId);

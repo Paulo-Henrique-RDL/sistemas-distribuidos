@@ -9,13 +9,5 @@ package br.edu.ifgoiano.contas.modelo;
 public enum TipoPessoa {
     CLIENTE,
     FORNECEDOR,
-    AMBOS;
-
-    public boolean podeSerCliente() {
-        return this == CLIENTE || this == AMBOS;
-    }
-
-    public boolean podeSerFornecedor() {
-        return this == FORNECEDOR || this == AMBOS;
-    }
+    AMBOS
 }

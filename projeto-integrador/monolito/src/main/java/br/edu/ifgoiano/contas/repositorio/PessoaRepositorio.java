@@ -1,7 +1,6 @@
 package br.edu.ifgoiano.contas.repositorio;
 
 import br.edu.ifgoiano.contas.modelo.Pessoa;
-import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,8 +10,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * nao existe classe PessoaRepositorioImpl escrita a mao.
  */
 public interface PessoaRepositorio extends JpaRepository<Pessoa, Long> {
-
-    Optional<Pessoa> findByDocumento(String documento);
 
     boolean existsByDocumento(String documento);
 

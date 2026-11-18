@@ -2,9 +2,7 @@ package br.edu.ifgoiano.contas.repositorio;
 
 import br.edu.ifgoiano.contas.modelo.ContaReceber;
 import br.edu.ifgoiano.contas.modelo.Situacao;
-import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -29,25 +27,6 @@ public interface ContaReceberRepositorio extends JpaRepository<ContaReceber, Lon
                                         @Param("clienteId") Long clienteId,
                                         @Param("categoriaId") Long categoriaId,
                                         Pageable paginacao);
-
-    @EntityGraph(attributePaths = {"cliente", "categoria", "formaRecebimento"})
-    List<ContaReceber> findBySituacaoAndDataVencimentoBeforeOrderByDataVencimento(Situacao situacao, LocalDate data);
-
-    @Query("""
-            select coalesce(sum(c.valor), 0) from ContaReceber c
-            where c.situacao = :situacao
-              and c.dataVencimento between :de and :ate
-            """)
-    BigDecimal somarPorSituacaoEPeriodo(@Param("situacao") Situacao situacao,
-                                        @Param("de") LocalDate de,
-                                        @Param("ate") LocalDate ate);
-
-    @Query("""
-            select coalesce(sum(c.valor), 0) from ContaReceber c
-            where c.situacao = br.edu.ifgoiano.contas.modelo.Situacao.ABERTA
-              and c.dataVencimento < :hoje
-            """)
-    BigDecimal somarVencidas(@Param("hoje") LocalDate hoje);
 
     boolean existsByClienteId(Long clienteId);
 
